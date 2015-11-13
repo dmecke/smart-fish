@@ -1,23 +1,23 @@
 <?php
 
-class SNeuronTest extends PHPUnit_Framework_TestCase
+class NeuronTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var SNeuron
+     * @var Neuron
      */
     private $neuron;
 
     protected function setUp()
     {
-        $this->neuron = new SNeuron(3);
+        $this->neuron = new Neuron(3);
     }
 
     /**
      * @test
      */
-    public function it_has_the_give_number_of_inputs()
+    public function it_has_the_given_number_of_inputs()
     {
-        $this->assertSame(3, $this->neuron->getMNumInputs());
+        $this->assertSame(3, $this->neuron->getInputs());
     }
 
     /**

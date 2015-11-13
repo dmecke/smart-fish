@@ -1,36 +1,30 @@
 <?php
 
-class SNeuron
+class Neuron
 {
-    /**
-     * @var int
-     */
-    private $m_NumInputs;
-
     /**
      * @var float[]
      */
-    private $m_vecWeight;
+    private $weights;
 
     /**
-     * @param int $NumInputs
+     * @param int $inputs
      */
-    public function __construct($NumInputs)
+    public function __construct($inputs)
     {
-        $this->m_NumInputs = $NumInputs;
         // we need an additional weight for the bias hence the +1
-        for ($i = 0; $i < $NumInputs + 1; $i++) {
+        for ($i = 0; $i < $inputs + 1; $i++) {
             // set up the weights with an initial random value
-            $this->m_vecWeight[] = Utils::RandomClamped();
+            $this->weights[] = Util::getRandomClamped();
         }
     }
 
     /**
      * @return int
      */
-    public function getMNumInputs()
+    public function getInputs()
     {
-        return $this->m_NumInputs;
+        return count($this->weights) - 1;
     }
 
     /**
@@ -42,10 +36,10 @@ class SNeuron
      */
     public function getWeight($index)
     {
-        if (!isset($this->m_vecWeight[$index])) {
+        if (!isset($this->weights[$index])) {
             throw new OutOfRangeException(sprintf('no weight defined for index %s', $index));
         }
-        return $this->m_vecWeight[$index];
+        return $this->weights[$index];
     }
 
     /**
@@ -54,6 +48,6 @@ class SNeuron
      */
     public function setWeight($index, $weight)
     {
-        $this->m_vecWeight[$index] = $weight;
+        $this->weights[$index] = $weight;
     }
 }
