@@ -37,9 +37,14 @@ class SNeuron
      * @param int $index
      *
      * @return float
+     *
+     * @throws OutOfRangeException
      */
     public function getWeight($index)
     {
+        if (!isset($this->m_vecWeight[$index])) {
+            throw new OutOfRangeException(sprintf('no weight defined for index %s', $index));
+        }
         return $this->m_vecWeight[$index];
     }
 
