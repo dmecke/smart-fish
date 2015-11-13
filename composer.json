@@ -1,0 +1,22 @@
+{
+    "name": "dmecke/smart-sweepers",
+    "description": "Evolution simulation of ai agents collecting items using a neural network and a gentic algorithm",
+    "keywords": ["ai", "ann", "neural network", "genetic algorithm", "evolution", "simulation"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniel Mecke",
+            "email": "daniel.mecke@cunningsoft.de"
+        },
+        {
+            "name": "Matt Buckland",
+            "homepage": "http://www.ai-junkie.com",
+            "role": "Original Author"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        }
+    }
+}
