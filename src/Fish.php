@@ -23,29 +23,9 @@ class Fish implements JsonSerializable
     private $position;
 
     /**
-     * @var Vector
-     */
-    private $lookAt;
-
-    /**
      * @var float
      */
     private $rotation;
-
-    /**
-     * @var float
-     */
-    private $speed;
-
-    /**
-     * @var float
-     */
-    private $turnLeft = 0.16;
-
-    /**
-     * @var float
-     */
-    private $turnRight = 0.16;
 
     /**
      * @var float
@@ -60,7 +40,6 @@ class Fish implements JsonSerializable
     public function __construct()
     {
         $this->reset();
-        $this->lookAt = Vector::nullVector(2);
         $this->neuralNet = new NeuralNet(self::BRAIN_INPUTS, self::BRAIN_OUTPUTS, self::BRAIN_HIDDEN_LAYERS, self::BRAIN_NEURONS_PER_HIDDEN_LAYER);
     }
 
@@ -134,9 +113,6 @@ class Fish implements JsonSerializable
      */
     public function update(array $food)
     {
-        // this will store all the inputs for the NN
-        $inputs = [];
-
         // get vector to closest food
         $closestFoodPosition = $this->getClosestFoodVector($food);
 
@@ -145,14 +121,16 @@ class Fish implements JsonSerializable
             $closestFoodPosition = $closestFoodPosition->normalize();
         }
 
+        // this will store all the inputs for the NN
+        $inputs = [];
+
         // add in vector to closest food
         $inputs[] = $closestFoodPosition->components()[0];
         $inputs[] = $closestFoodPosition->components()[1];
 
         // add in fish look at vector
-        $inputs[] = $this->lookAt->components()[0];
-        $inputs[] = $this->lookAt->components()[1];
-
+        $inputs[] = $this->lookAt()->components()[0];
+        $inputs[] = $this->lookAt()->components()[1];
 
         // update the brain and get feedback
         $output = $this->neuralNet->update($inputs);
@@ -163,24 +141,24 @@ class Fish implements JsonSerializable
         }
 
         // assign the outputs to the fish turn left & right
-        $this->turnLeft = $output[0];
-        $this->turnRight = $output[1];
+        $turnLeft = $output[0];
+        $turnRight = $output[1];
 
         // calculate steering forces
-        $rotationForce = $this->turnLeft - $this->turnRight;
+        $rotationForce = $turnLeft - $turnRight;
 
         // clamp rotation
         $rotationForce = Util::clamp($rotationForce, -self::MAX_TURN_RATE, self::MAX_TURN_RATE);
 
         $this->rotation += $rotationForce;
 
-        $this->speed = ($this->turnLeft + $this->turnRight);
+        $speed = $turnLeft + $turnRight;
 
         // update Look At
-        $this->lookAt = new Vector([-sin($this->rotation), cos($this->rotation)]);
+        $this->lookAt();
 
         // update position
-        $this->position = $this->position->add($this->lookAt->multiplyByScalar($this->speed));
+        $this->position = $this->position->add($this->lookAt()->multiplyByScalar($speed));
 
         // wrap around window limits
         if ($this->position->components()[0] > Simulation::WIDTH) {
@@ -240,5 +218,13 @@ class Fish implements JsonSerializable
             'position' => ['x' => $this->position->components()[0], 'y' => $this->position->components()[1]],
             'fitness' => $this->fitness,
         ];
+    }
+
+    /**
+     * @return Vector
+     */
+    private function lookAt()
+    {
+        return new Vector([-sin($this->rotation), cos($this->rotation)]);
     }
 }
