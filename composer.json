@@ -11,12 +11,12 @@
         {
             "name": "Matt Buckland",
             "homepage": "http://www.ai-junkie.com",
-            "role": "Original Author"
+            "role": "Author of SmartSweepers"
         }
     ],
     "autoload": {
         "psr-4": {
-            "": "src/"
+            "SmartFish\\": "src/SmartFish"
         }
     },
     "require": {

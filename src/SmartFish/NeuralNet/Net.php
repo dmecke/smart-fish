@@ -1,6 +1,8 @@
 <?php
 
-class NeuralNet
+namespace SmartFish\NeuralNet;
+
+class Net
 {
     /**
      * @var int
@@ -60,7 +62,7 @@ class NeuralNet
     /**
      * this method builds the ANN. The weights are all initially set to random values -1 < w < 1
      */
-    public function createNet()
+    private function createNet()
     {
         // create the layers of the network
         if ($this->hiddenLayers > 0) {
@@ -84,7 +86,7 @@ class NeuralNet
      *
      * given a vector of doubles this function replaces the weights in the NN with the new values
      */
-    public function putWeights(array $weights)
+    public function updateWeights(array $weights)
     {
         $index = 0;
 
@@ -184,7 +186,7 @@ class NeuralNet
      *
      * @return float
      */
-    public function sigmoid($inputValue)
+    private function sigmoid($inputValue)
     {
         return (1 / (1 + exp(-$inputValue / $this->activation)));
     }

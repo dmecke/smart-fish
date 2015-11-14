@@ -1,5 +1,10 @@
 <?php
 
+namespace SmartFish\NeuralNet;
+
+use OutOfRangeException;
+use PHPUnit_Framework_TestCase;
+
 class NeuronTest extends PHPUnit_Framework_TestCase
 {
     /**

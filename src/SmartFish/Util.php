@@ -1,5 +1,7 @@
 <?php
 
+namespace SmartFish;
+
 class Util
 {
     /**

@@ -1,6 +1,9 @@
 <?php
 
+namespace SmartFish;
+
 use Doctrine\Common\Collections\ArrayCollection;
+use Exception;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 

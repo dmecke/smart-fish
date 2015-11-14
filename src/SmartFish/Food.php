@@ -1,5 +1,8 @@
 <?php
 
+namespace SmartFish;
+
+use JsonSerializable;
 use Nubs\Vectorix\Vector;
 
 class Food implements JsonSerializable

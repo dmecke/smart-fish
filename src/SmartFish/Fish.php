@@ -1,6 +1,11 @@
 <?php
 
+namespace SmartFish;
+
+use JsonSerializable;
 use Nubs\Vectorix\Vector;
+use SmartFish\Genetic\Genome;
+use SmartFish\NeuralNet\Net;
 
 class Fish implements JsonSerializable
 {
@@ -13,7 +18,7 @@ class Fish implements JsonSerializable
     const SIZE = 5;
 
     /**
-     * @var NeuralNet
+     * @var Net
      */
     private $neuralNet;
 
@@ -28,26 +33,29 @@ class Fish implements JsonSerializable
     private $rotation;
 
     /**
-     * @var float
-     */
-    private $fitness = 0.0;
-
-    /**
      * @var int
      */
     private $closestFoodIndex;
 
-    public function __construct()
-    {
-        $this->reset();
-        $this->neuralNet = new NeuralNet(self::BRAIN_INPUTS, self::BRAIN_OUTPUTS, self::BRAIN_HIDDEN_LAYERS, self::BRAIN_NEURONS_PER_HIDDEN_LAYER);
-    }
+    /**
+     * @var Genome
+     */
+    private $genome;
 
-    public function reset()
+    /**
+     * @param Net $neuralNet
+     * @param Genome $genome
+     */
+    public function __construct(Net $neuralNet, Genome $genome)
     {
+        $this->genome = $genome;
+        $this->genome->setFitness(0.0);
+
+        $this->neuralNet = $neuralNet;
+        $this->neuralNet->updateWeights($genome->getWeights());
+
         $this->position = new Vector([mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT)]);
         $this->rotation = rand(0, 100) * pi() * 2;
-        $this->fitness = 0;
     }
 
     /**
@@ -55,7 +63,7 @@ class Fish implements JsonSerializable
      */
     public function eat(Food $food)
     {
-        $this->fitness += $food->getNutritionalValue();
+        $this->genome->addFitness($food->getNutritionalValue());
     }
 
     /**
@@ -63,23 +71,7 @@ class Fish implements JsonSerializable
      */
     public function getFitness()
     {
-        return $this->fitness;
-    }
-
-    /**
-     * @return int
-     */
-    public function getNumberOfWeights()
-    {
-        return $this->neuralNet->getNumberOfWeights();
-    }
-
-    /**
-     * @param float[] $weights
-     */
-    public function putWeights(array $weights)
-    {
-        $this->neuralNet->putWeights($weights);
+        return $this->genome->getFitness();
     }
 
     /**
@@ -97,10 +89,10 @@ class Fish implements JsonSerializable
 
         return -1;
     }
-    
+
     /**
      * @param Food[] $food
-     * 
+     *
      * @return bool
      *
      * @throws \Exception
@@ -140,7 +132,13 @@ class Fish implements JsonSerializable
 
         // make sure there were no errors in calculating the output
         if (count($output) < self::BRAIN_OUTPUTS) {
-            throw new \Exception(sprintf('number of output values (%s) does not match expected number (%s)', count($output), self::BRAIN_OUTPUTS));
+            throw new \Exception(
+                sprintf(
+                    'number of output values (%s) does not match expected number (%s)',
+                    count($output),
+                    self::BRAIN_OUTPUTS
+                )
+            );
         }
 
         // assign the outputs to the fish turn left & right
@@ -156,9 +154,6 @@ class Fish implements JsonSerializable
         $this->rotation += $rotationForce;
 
         $speed = $turnLeft + $turnRight;
-
-        // update Look At
-        $this->lookAt();
 
         // update position
         $this->position = $this->position->add($this->lookAt()->multiplyByScalar($speed));
@@ -176,8 +171,6 @@ class Fish implements JsonSerializable
         if ($this->position->components()[1] < 0) {
             $this->position = new Vector([$this->position->components()[0], Simulation::HEIGHT]);
         }
-
-        return true;
     }
 
     /**
@@ -185,7 +178,7 @@ class Fish implements JsonSerializable
      *
      * @return Vector
      */
-    public function getClosestFoodVector(array $food)
+    private function getClosestFoodVector(array $food)
     {
         $closestSoFar = 99999;
         $closestFoodVector = Vector::nullVector(2);
@@ -205,21 +198,13 @@ class Fish implements JsonSerializable
     }
 
     /**
-     * @return Vector
-     */
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    /**
      * @return array
      */
     public function jsonSerialize()
     {
         return [
             'position' => ['x' => $this->position->components()[0], 'y' => $this->position->components()[1]],
-            'fitness' => $this->fitness,
+            'fitness' => $this->genome->getFitness(),
         ];
     }
 
@@ -229,5 +214,22 @@ class Fish implements JsonSerializable
     private function lookAt()
     {
         return new Vector([-sin($this->rotation), cos($this->rotation)]);
+    }
+
+    /**
+     * @return Genome
+     */
+    public function getGenome()
+    {
+        return $this->genome;
+    }
+
+    /**
+     * @param Genome $genome
+     */
+    public function setGenome(Genome $genome)
+    {
+        $this->genome = $genome;
+        $this->neuralNet->updateWeights($genome->getWeights());
     }
 }

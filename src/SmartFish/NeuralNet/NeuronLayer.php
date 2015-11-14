@@ -1,5 +1,7 @@
 <?php
 
+namespace SmartFish\NeuralNet;
+
 class NeuronLayer
 {
     /**

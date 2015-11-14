@@ -1,5 +1,10 @@
 <?php
 
+namespace SmartFish\NeuralNet;
+
+use OutOfRangeException;
+use SmartFish\Util;
+
 class Neuron
 {
     /**
@@ -39,6 +44,7 @@ class Neuron
         if (!isset($this->weights[$index])) {
             throw new OutOfRangeException(sprintf('no weight defined for index %s', $index));
         }
+
         return $this->weights[$index];
     }
 
