@@ -1,6 +1,6 @@
 <?php
 
-class Mine
+class Food
 {
     const SIZE = 2;
 }

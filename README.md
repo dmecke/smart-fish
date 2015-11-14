@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/dmecke/smart-sweepers.svg)](https://travis-ci.org/dmecke/smart-sweepers)
+[![Build Status](https://travis-ci.org/dmecke/smart-fish.svg)](https://travis-ci.org/dmecke/smart-fish)
 
 # Neural Network with Genetic Algorithm
 

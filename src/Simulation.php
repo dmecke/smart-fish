@@ -9,8 +9,8 @@ class Simulation implements JsonSerializable
 
     const TICKS_PER_GENERATION = 2000;
 
-    const NUMBER_OF_SWEEPERS = 30;
-    const NUMBER_OF_MINES = 40;
+    const NUMBER_OF_FISHES = 30;
+    const NUMBER_OF_FOOD = 40;
 
     /**
      * @var Genome[]
@@ -18,14 +18,14 @@ class Simulation implements JsonSerializable
     private $genomes = [];
 
     /**
-     * @var MineSweeper[]
+     * @var Fish[]
      */
-    private $mineSweepers = [];
+    private $fishes = [];
 
     /**
      * @var Vector[]
      */
-    private $mines = [];
+    private $food = [];
 
     /**
      * @var GeneticAlgorithm
@@ -35,7 +35,7 @@ class Simulation implements JsonSerializable
     /**
      * @var int
      */
-    private $m_NumWeightsInNN;
+    private $numberOfWeights;
 
     /**
      * @var int
@@ -49,64 +49,63 @@ class Simulation implements JsonSerializable
 
     public function __construct()
     {
-        // let's create the mine sweepers
-        for ($i = 0; $i < self::NUMBER_OF_SWEEPERS; $i++) {
-            $this->mineSweepers[] = new MineSweeper();
+        // let's create the fishes
+        for ($i = 0; $i < self::NUMBER_OF_FISHES; $i++) {
+            $this->fishes[] = new Fish();
         }
 
-        // get the total number of weights used in the sweepers
-        // NN so we can initialise the GA
-        $this->m_NumWeightsInNN = $this->mineSweepers[0]->getNumberOfWeights();
+        // get the total number of weights used in the fish NN so we can initialise the GA
+        $this->numberOfWeights = $this->fishes[0]->getNumberOfWeights();
 
         // initialize the genetic algorithm class
-        $this->geneticAlgorithm = new GeneticAlgorithm(self::NUMBER_OF_SWEEPERS, $this->m_NumWeightsInNN);
+        $this->geneticAlgorithm = new GeneticAlgorithm(self::NUMBER_OF_FISHES, $this->numberOfWeights);
 
-        // get the weights from the ga and insert into the sweepers brains
+        // get the weights from the ga and insert into the fish brains
         $this->genomes = $this->geneticAlgorithm->getChromos();
 
-        for ($i = 0; $i < self::NUMBER_OF_SWEEPERS; $i++) {
-            $this->mineSweepers[$i]->putWeights($this->genomes[$i]->getWeights());
+        for ($i = 0; $i < self::NUMBER_OF_FISHES; $i++) {
+            $this->fishes[$i]->putWeights($this->genomes[$i]->getWeights());
         }
 
-        // initialize mines in random positions within the application window
-        for ($i = 0; $i < self::NUMBER_OF_MINES; $i++) {
-            $this->mines[] = new Vector([mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT)]);
+        // initialize food in random positions within the application window
+        for ($i = 0; $i < self::NUMBER_OF_FOOD; $i++) {
+            $this->food[] = new Vector([mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT)]);
         }
     }
 
     public function update()
     {
-        // run the sweepers through CParams::iNumTicks amount of cycles. During
-        // this loop each sweepers NN is constantly updated with the appropriate
+        // run the fish through all ticks of a generation. During
+        // this loop each fish NN is constantly updated with the appropriate
         // information from its surroundings. The output from the NN is obtained
-        // and the sweeper is moved. If it encounters a mine its fitness is
+        // and the fish is moved. If it finds food its fitness is
         // updated appropriately,
         if ($this->tick++ < self::TICKS_PER_GENERATION)
         {
-            for ($i = 0; $i < self::NUMBER_OF_SWEEPERS; $i++) {
+            for ($i = 0; $i < self::NUMBER_OF_FISHES; $i++) {
                 // update the NN and position
-                if (!$this->mineSweepers[$i]->update($this->mines)) {
+                if (!$this->fishes[$i]->update($this->food)) {
                     // error in processing the neural net
                     throw new \Exception('Wrong amount of NN inputs!');
                 }
 
-                // see if it's found a mine
-                $grabHit = $this->mineSweepers[$i]->checkForMine($this->mines);
+                // see if it's found food
+                $grabHit = $this->fishes[$i]->checkForFood($this->food);
 
                 if ($grabHit >= 0) {
-                    // we have discovered a mine so increase fitness
-                    $this->mineSweepers[$i]->incrementFitness();
+                    // we have discovered food so increase fitness
+                    $this->fishes[$i]->incrementFitness();
 
-                    // mine found so replace the mine with another at a random position
-                    $this->mines[$grabHit] = new Vector([mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT)]);
+                    // food found so replace it with another at a random position
+                    $this->food[$grabHit] = new Vector([mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT)]);
                 }
 
                 // update the chromos fitness score
-                $this->genomes[$i]->setFitness($this->mineSweepers[$i]->getFitness());
+                $this->genomes[$i]->setFitness($this->fishes[$i]->getFitness());
             }
         } else {
             // Another generation has been completed.
-            // Time to run the GA and update the sweepers with their new NNs
+            // Time to run the GA and update the fishes with their new NNs
 
             // increment the generation counter
             $this->generation++;
@@ -117,12 +116,11 @@ class Simulation implements JsonSerializable
             // run the GA to create a new population
             $this->genomes = $this->geneticAlgorithm->epoch($this->genomes);
 
-            // insert the new (hopefully)improved brains back into the sweepers
-            // and reset their positions etc
-            for ($i = 0; $i < self::NUMBER_OF_SWEEPERS; $i++) {
-                $this->mineSweepers[$i]->putWeights($this->genomes[$i]->getWeights());
+            // insert the new (hopefully)improved brains back into the fishes and reset their positions etc
+            for ($i = 0; $i < self::NUMBER_OF_FISHES; $i++) {
+                $this->fishes[$i]->putWeights($this->genomes[$i]->getWeights());
 
-                $this->mineSweepers[$i]->reset();
+                $this->fishes[$i]->reset();
             }
             $this->printGeneration();
         }
@@ -150,14 +148,14 @@ class Simulation implements JsonSerializable
      */
     function jsonSerialize()
     {
-        $mines = [];
-        foreach ($this->mines as $mine) {
-            $mines[] = ['x' => $mine->components()[0], 'y' => $mine->components()[1]];
+        $foods = [];
+        foreach ($this->food as $food) {
+            $foods[] = ['x' => $food->components()[0], 'y' => $food->components()[1]];
         }
 
         return [
-            'mineSweepers' => $this->mineSweepers,
-            'mines' => $mines,
+            'fishes' => $this->fishes,
+            'foods' => $foods,
         ];
     }
 }

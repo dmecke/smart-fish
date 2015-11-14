@@ -2,7 +2,7 @@
 
 use Nubs\Vectorix\Vector;
 
-class MineSweeper implements JsonSerializable
+class Fish implements JsonSerializable
 {
     const BRAIN_INPUTS = 4;
     const BRAIN_OUTPUTS = 2;
@@ -40,12 +40,12 @@ class MineSweeper implements JsonSerializable
     /**
      * @var float
      */
-    private $leftTrack = 0.16;
+    private $turnLeft = 0.16;
 
     /**
      * @var float
      */
-    private $rightTrack = 0.16;
+    private $turnRight = 0.16;
 
     /**
      * @var float
@@ -55,7 +55,7 @@ class MineSweeper implements JsonSerializable
     /**
      * @var int
      */
-    private $closestMine;
+    private $closestFood;
 
     public function __construct()
     {
@@ -101,55 +101,55 @@ class MineSweeper implements JsonSerializable
     }
 
     /**
-     * @param Vector[] $mines
+     * @param Vector[] $fishes
      *
      * @return int
      */
-    public function checkForMine(array $mines)
+    public function checkForFood(array $fishes)
     {
-        $distance = $this->position->subtract($mines[$this->closestMine]);
+        $distance = $this->position->subtract($fishes[$this->closestFood]);
 
-        if ($distance->length() < (Mine::SIZE + self::SIZE)) {
-            return $this->closestMine;
+        if ($distance->length() < (Food::SIZE + self::SIZE)) {
+            return $this->closestFood;
         }
 
         return -1;
     }
     
     /**
-     * @param Vector[] $mines
+     * @param Vector[] $food
      * 
      * @return bool
      *
      * @throws \Exception
      *
-     * First we take sensor readings and feed these into the sweepers brain.
+     * First we take sensor readings and feed these into the fish brain.
      * The inputs are:
      *
-     * A vector to the closest mine (x, y)
-     * The sweepers 'look at' vector (x, y)
-     * We receive two outputs from the brain.. lTrack & rTrack.
-     * So given a force for each track we calculate the resultant rotation
+     * A vector to the closest food (x, y)
+     * The fish 'look at' vector (x, y)
+     * We receive two outputs from the brain.. turnLeft & turnRight.
+     * So given a force for each side we calculate the resultant rotation
      * and acceleration and apply to current velocity vector.
      */
-    public function update(array $mines)
+    public function update(array $food)
     {
         // this will store all the inputs for the NN
         $inputs = [];
 
-        // get vector to closest mine
-        $closestMine = $this->getClosestMine($mines);
+        // get vector to closest food
+        $closestFood = $this->getClosestFood($food);
 
         // normalise it
-        if ($closestMine->length() != 0) {
-            $closestMine = $closestMine->normalize();
+        if ($closestFood->length() != 0) {
+            $closestFood = $closestFood->normalize();
         }
 
-        // add in vector to closest mine
-        $inputs[] = $closestMine->components()[0];
-        $inputs[] = $closestMine->components()[1];
+        // add in vector to closest food
+        $inputs[] = $closestFood->components()[0];
+        $inputs[] = $closestFood->components()[1];
 
-        // add in sweepers look at vector
+        // add in fish look at vector
         $inputs[] = $this->lookAt->components()[0];
         $inputs[] = $this->lookAt->components()[1];
 
@@ -162,19 +162,19 @@ class MineSweeper implements JsonSerializable
             throw new \Exception(sprintf('number of output values (%s) does not match expected number (%s)', count($output), self::BRAIN_OUTPUTS));
         }
 
-        // assign the outputs to the sweepers left & right tracks
-        $this->leftTrack = $output[0];
-        $this->rightTrack = $output[1];
+        // assign the outputs to the fish turn left & right
+        $this->turnLeft = $output[0];
+        $this->turnRight = $output[1];
 
         // calculate steering forces
-        $rotationForce = $this->leftTrack - $this->rightTrack;
+        $rotationForce = $this->turnLeft - $this->turnRight;
 
         // clamp rotation
         $rotationForce = Util::clamp($rotationForce, -self::MAX_TURN_RATE, self::MAX_TURN_RATE);
 
         $this->rotation += $rotationForce;
 
-        $this->speed = ($this->leftTrack + $this->rightTrack);
+        $this->speed = ($this->turnLeft + $this->turnRight);
 
         // update Look At
         $this->lookAt = new Vector([-sin($this->rotation), cos($this->rotation)]);
@@ -200,23 +200,23 @@ class MineSweeper implements JsonSerializable
     }
 
     /**
-     * @param Vector[] $mines
+     * @param Vector[] $food
      *
      * @return Vector
      */
-    public function getClosestMine(array $mines)
+    public function getClosestFood(array $food)
     {
         $closestSoFar = 99999;
         $closestObject = Vector::nullVector(2);
 
-        // cycle through mines to find closest
-        for ($i = 0; $i < count($mines); $i++) {
-            $distanceToObject = $mines[$i]->subtract($this->position)->length();
+        // cycle through food to find closest
+        for ($i = 0; $i < count($food); $i++) {
+            $distanceToObject = $food[$i]->subtract($this->position)->length();
 
             if ($distanceToObject < $closestSoFar) {
                 $closestSoFar = $distanceToObject;
-                $closestObject = $this->position->subtract($mines[$i]);
-                $this->closestMine = $i;
+                $closestObject = $this->position->subtract($food[$i]);
+                $this->closestFood = $i;
             }
         }
 

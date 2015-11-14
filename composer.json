@@ -1,5 +1,5 @@
 {
-    "name": "dmecke/smart-sweepers",
+    "name": "dmecke/smart-fish",
     "description": "Evolution simulation of ai agents collecting items using a neural network and a gentic algorithm",
     "keywords": ["ai", "ann", "neural network", "genetic algorithm", "evolution", "simulation"],
     "license": "MIT",
