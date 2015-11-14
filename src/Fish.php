@@ -55,7 +55,7 @@ class Fish implements JsonSerializable
     /**
      * @var int
      */
-    private $closestFood;
+    private $closestFoodIndex;
 
     public function __construct()
     {
@@ -101,23 +101,23 @@ class Fish implements JsonSerializable
     }
 
     /**
-     * @param Vector[] $fishes
+     * @param Food[] $foods
      *
      * @return int
      */
-    public function checkForFood(array $fishes)
+    public function checkForFood(array $foods)
     {
-        $distance = $this->position->subtract($fishes[$this->closestFood]);
+        $distance = $this->position->subtract($foods[$this->closestFoodIndex]->getPosition());
 
         if ($distance->length() < (Food::SIZE + self::SIZE)) {
-            return $this->closestFood;
+            return $this->closestFoodIndex;
         }
 
         return -1;
     }
     
     /**
-     * @param Vector[] $food
+     * @param Food[] $food
      * 
      * @return bool
      *
@@ -138,16 +138,16 @@ class Fish implements JsonSerializable
         $inputs = [];
 
         // get vector to closest food
-        $closestFood = $this->getClosestFood($food);
+        $closestFoodPosition = $this->getClosestFoodVector($food);
 
         // normalise it
-        if ($closestFood->length() != 0) {
-            $closestFood = $closestFood->normalize();
+        if ($closestFoodPosition->length() != 0) {
+            $closestFoodPosition = $closestFoodPosition->normalize();
         }
 
         // add in vector to closest food
-        $inputs[] = $closestFood->components()[0];
-        $inputs[] = $closestFood->components()[1];
+        $inputs[] = $closestFoodPosition->components()[0];
+        $inputs[] = $closestFoodPosition->components()[1];
 
         // add in fish look at vector
         $inputs[] = $this->lookAt->components()[0];
@@ -200,27 +200,27 @@ class Fish implements JsonSerializable
     }
 
     /**
-     * @param Vector[] $food
+     * @param Food[] $food
      *
      * @return Vector
      */
-    public function getClosestFood(array $food)
+    public function getClosestFoodVector(array $food)
     {
         $closestSoFar = 99999;
-        $closestObject = Vector::nullVector(2);
+        $closestFoodVector = Vector::nullVector(2);
 
         // cycle through food to find closest
         for ($i = 0; $i < count($food); $i++) {
-            $distanceToObject = $food[$i]->subtract($this->position)->length();
+            $distanceToObject = $food[$i]->getPosition()->subtract($this->position)->length();
 
             if ($distanceToObject < $closestSoFar) {
                 $closestSoFar = $distanceToObject;
-                $closestObject = $this->position->subtract($food[$i]);
-                $this->closestFood = $i;
+                $closestFoodVector = $this->position->subtract($food[$i]->getPosition());
+                $this->closestFoodIndex = $i;
             }
         }
 
-        return $closestObject;
+        return $closestFoodVector;
     }
 
     /**

@@ -7,43 +7,53 @@
 <body>
     <canvas id="canvas"></canvas>
     <script type="text/javascript">
-var data;
+var data, context;
 
 var ws = new WebSocket('ws://localhost:8080');
 ws.onmessage = function(event) { data = JSON.parse(event.data); };
+
+var scale = 2;
+var canvas = document.getElementById('canvas');
+canvas.width = 400 * scale;
+canvas.height = 400 * scale;
+
+context = canvas.getContext('2d');
 
 setInterval(render, 30);
 
 function render()
 {
-    var canvas = document.getElementById('canvas');
-    var context = canvas.getContext('2d');
-    var scale = 2;
-
-    canvas.width = 400 * scale;
-    canvas.height = 400 * scale;
     context.clearRect(0, 0, 400 * scale, 400 * scale);
 
-    if (!data) {
-        return;
-    }
+    if (!data) return;
 
+    renderFishes(data.fishes);
+    renderFood(data.foods);
+}
+
+function renderFishes(fishes)
+{
     context.font = (4 * scale) + 'px Arial';
-    for (var i = 0; i < data.fishes.length; i++) {
-        var fish = data.fishes[i];
-        var positionX = fish.position.x * scale - 2;
-        var positionY = fish.position.y * scale - 2;
+    for (var i = 0; i < fishes.length; i++) {
+        var fish = fishes[i];
+        var fishPositionX = fish.position.x * scale - 2;
+        var fishPositionY = fish.position.y * scale - 2;
         context.fillStyle = '#f00';
-        context.fillRect(positionX, positionY, 5 * scale, 5 * scale);
+        context.fillRect(fishPositionX, fishPositionY, 5 * scale, 5 * scale);
 
         context.fillStyle = '#fff';
-        context.fillText(fish.fitness, positionX + scale, positionY + scale * 4);
+        context.fillText(fish.fitness, fishPositionX + scale, fishPositionY + scale * 4);
     }
+}
 
+function renderFood(foods)
+{
     context.fillStyle = '#00f';
-    for (var j = 0; j < data.foods.length; j++) {
-        var food = data.foods[j];
-        context.fillRect(food.x * scale, food.y * scale, scale, scale);
+    for (var j = 0; j < foods.length; j++) {
+        var food = foods[j];
+        var positionX = food.position.x * scale;
+        var positionY = food.position.y * scale;
+        context.fillRect(positionX, positionY, scale, scale);
     }
 }
     </script>

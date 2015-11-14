@@ -1,7 +1,5 @@
 <?php
 
-use Nubs\Vectorix\Vector;
-
 class Simulation implements JsonSerializable
 {
     const WIDTH = 400;
@@ -23,9 +21,9 @@ class Simulation implements JsonSerializable
     private $fishes = [];
 
     /**
-     * @var Vector[]
+     * @var Food[]
      */
-    private $food = [];
+    private $foods = [];
 
     /**
      * @var GeneticAlgorithm
@@ -69,7 +67,7 @@ class Simulation implements JsonSerializable
 
         // initialize food in random positions within the application window
         for ($i = 0; $i < self::NUMBER_OF_FOOD; $i++) {
-            $this->food[] = new Vector([mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT)]);
+            $this->foods[] = new Food();
         }
     }
 
@@ -84,20 +82,20 @@ class Simulation implements JsonSerializable
         {
             for ($i = 0; $i < self::NUMBER_OF_FISHES; $i++) {
                 // update the NN and position
-                if (!$this->fishes[$i]->update($this->food)) {
+                if (!$this->fishes[$i]->update($this->foods)) {
                     // error in processing the neural net
                     throw new \Exception('Wrong amount of NN inputs!');
                 }
 
                 // see if it's found food
-                $grabHit = $this->fishes[$i]->checkForFood($this->food);
+                $grabHit = $this->fishes[$i]->checkForFood($this->foods);
 
                 if ($grabHit >= 0) {
                     // we have discovered food so increase fitness
                     $this->fishes[$i]->incrementFitness();
 
                     // food found so replace it with another at a random position
-                    $this->food[$grabHit] = new Vector([mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT)]);
+                    $this->foods[$grabHit] = new Food();
                 }
 
                 // update the chromos fitness score
@@ -148,14 +146,9 @@ class Simulation implements JsonSerializable
      */
     function jsonSerialize()
     {
-        $foods = [];
-        foreach ($this->food as $food) {
-            $foods[] = ['x' => $food->components()[0], 'y' => $food->components()[1]];
-        }
-
         return [
             'fishes' => $this->fishes,
-            'foods' => $foods,
+            'foods' => $this->foods,
         ];
     }
 }
