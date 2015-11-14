@@ -11,9 +11,18 @@ class Food implements JsonSerializable
      */
     private $position;
 
-    public function __construct()
+    /**
+     * @var float
+     */
+    private $nutritionalValue;
+
+    /**
+     * @param float $nutritionalValue
+     */
+    public function __construct($nutritionalValue = 1.0)
     {
         $this->position = new Vector([mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT)]);
+        $this->nutritionalValue = $nutritionalValue;
     }
 
     /**
@@ -32,5 +41,13 @@ class Food implements JsonSerializable
     public function getPosition()
     {
         return $this->position;
+    }
+
+    /**
+     * @return float
+     */
+    public function getNutritionalValue()
+    {
+        return $this->nutritionalValue;
     }
 }

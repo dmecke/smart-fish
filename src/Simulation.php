@@ -92,7 +92,7 @@ class Simulation implements JsonSerializable
 
                 if ($grabHit >= 0) {
                     // we have discovered food so increase fitness
-                    $this->fishes[$i]->incrementFitness();
+                    $this->fishes[$i]->eat($this->foods[$grabHit]);
 
                     // food found so replace it with another at a random position
                     $this->foods[$grabHit] = new Food();

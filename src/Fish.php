@@ -30,7 +30,7 @@ class Fish implements JsonSerializable
     /**
      * @var float
      */
-    private $fitness = 0;
+    private $fitness = 0.0;
 
     /**
      * @var int
@@ -50,9 +50,12 @@ class Fish implements JsonSerializable
         $this->fitness = 0;
     }
 
-    public function incrementFitness()
+    /**
+     * @param Food $food
+     */
+    public function eat(Food $food)
     {
-        $this->fitness++;
+        $this->fitness += $food->getNutritionalValue();
     }
 
     /**
