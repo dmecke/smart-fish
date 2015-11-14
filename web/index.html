@@ -3,19 +3,96 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Smart Fish</title>
+    <link href="bootstrap.css" rel="stylesheet">
+    <script type="text/javascript" src="vue.js"></script>
 </head>
-<body>
-    <canvas id="canvas"></canvas>
+<body id="app">
+    <div class="container">
+        <div class="header clearfix">
+            <h3 class="text-muted">Smart Fish</h3>
+        </div>
+
+        <div class="jumbotron">
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Fitness</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(fitness, amount) in fitnessTable | orderBy $key | reverse">
+                            <td>{{ fitness }}</td>
+                            <td>{{ amount }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr />
+
+        <footer class="footer">
+            <p>Made with &hearts; in Hamburg, Germany.</p>
+        </footer>
+    </div>
+
     <script type="text/javascript">
-var data, context;
+var context;
+
+Vue.config.debug = true;
+Vue.filter('reverse', function(array) {
+    return array.reverse();
+});
+var vm = new Vue({
+    el: '#app',
+    data: {
+        response: null
+    },
+    computed: {
+        fishes: function() {
+            if (!this.response) {
+                return [];
+            }
+            return this.response.fishes;
+        },
+        foods: function() {
+            if (!this.response) {
+                return [];
+            }
+            return this.response.foods;
+        },
+        fitnessTable: function() {
+            var fishes = this.fishes;
+            var groups = {};
+            for (var i = 0; i < fishes.length; i++) {
+                var fitness = fishes[i].fitness;
+                if (!groups[fitness]) {
+                    groups[fitness] = 0;
+                }
+
+                groups[fitness]++;
+            }
+
+            return groups;
+        }
+    }
+});
 
 var ws = new WebSocket('ws://localhost:8080');
-ws.onmessage = function(event) { data = JSON.parse(event.data); };
+ws.onmessage = function(event) { vm.response = JSON.parse(event.data); };
 
-var scale = 2;
 var canvas = document.getElementById('canvas');
-canvas.width = 400 * scale;
-canvas.height = 400 * scale;
+canvas.style.width = '100%';
+canvas.width = canvas.offsetWidth;
+canvas.style.height = canvas.width;
+canvas.height = canvas.width;
+var scale = canvas.width / 400;
 
 context = canvas.getContext('2d');
 
@@ -23,12 +100,10 @@ setInterval(render, 30);
 
 function render()
 {
-    context.clearRect(0, 0, 400 * scale, 400 * scale);
+    context.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (!data) return;
-
-    renderFishes(data.fishes);
-    renderFood(data.foods);
+    renderFishes(vm.fishes);
+    renderFood(vm.foods);
 }
 
 function renderFishes(fishes)
