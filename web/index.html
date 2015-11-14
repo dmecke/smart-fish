@@ -24,6 +24,10 @@ function render()
     canvas.height = 400 * scale;
     context.clearRect(0, 0, 400 * scale, 400 * scale);
 
+    if (!data) {
+        return;
+    }
+
     context.font = (4 * scale) + 'px Arial';
     for (var i = 0; i < data.mineSweepers.length; i++) {
         var mineSweeper = data.mineSweepers[i];

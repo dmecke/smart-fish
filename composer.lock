@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d942b37a4f51c812d43443505f76b66e",
-    "content-hash": "d7789bb078e718b6441f82be0c77a3bb",
+    "hash": "47a615422dc5c6682fe603e3342c33e2",
+    "content-hash": "26388e50cba8a7d85682eb539e2c5cfc",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -368,6 +368,50 @@
             ],
             "abandoned": "guzzle/guzzle",
             "time": "2014-05-01 21:36:02"
+        },
+        {
+            "name": "nubs/vectorix",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nubs/vectorix.git",
+                "reference": "c7377a44f338d841c779cea7953681fee69c639a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nubs/vectorix/zipball/c7377a44f338d841c779cea7953681fee69c639a",
+                "reference": "c7377a44f338d841c779cea7953681fee69c639a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Nubs\\Vectorix\\": "src"
+                }
+            },
+            "notification-url": "http://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Spencer Rinehart",
+                    "email": "anubis@overthemonkey.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A vector library.",
+            "keywords": [
+                "math",
+                "vector"
+            ],
+            "time": "2014-05-05 11:13:57"
         },
         {
             "name": "react/event-loop",

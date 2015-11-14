@@ -21,7 +21,8 @@
     },
     "require": {
         "cboden/ratchet": "0.3.*",
-        "doctrine/collections": "1.3.0"
+        "doctrine/collections": "1.3.0",
+        "nubs/vectorix": "1.1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "5.0.*"

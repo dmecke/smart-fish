@@ -1,5 +1,7 @@
 <?php
 
+use Nubs\Vectorix\Vector;
+
 class Simulation implements JsonSerializable
 {
     const WIDTH = 400;
@@ -68,7 +70,7 @@ class Simulation implements JsonSerializable
 
         // initialize mines in random positions within the application window
         for ($i = 0; $i < self::NUMBER_OF_MINES; $i++) {
-            $this->mines[] = new Vector(mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT));
+            $this->mines[] = new Vector([mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT)]);
         }
     }
 
@@ -96,7 +98,7 @@ class Simulation implements JsonSerializable
                     $this->mineSweepers[$i]->incrementFitness();
 
                     // mine found so replace the mine with another at a random position
-                    $this->mines[$grabHit] = new Vector(mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT));
+                    $this->mines[$grabHit] = new Vector([mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT)]);
                 }
 
                 // update the chromos fitness score
@@ -148,9 +150,14 @@ class Simulation implements JsonSerializable
      */
     function jsonSerialize()
     {
+        $mines = [];
+        foreach ($this->mines as $mine) {
+            $mines[] = ['x' => $mine->components()[0], 'y' => $mine->components()[1]];
+        }
+
         return [
             'mineSweepers' => $this->mineSweepers,
-            'mines' => $this->mines,
+            'mines' => $mines,
         ];
     }
 }

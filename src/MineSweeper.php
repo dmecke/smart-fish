@@ -1,5 +1,7 @@
 <?php
 
+use Nubs\Vectorix\Vector;
+
 class MineSweeper implements JsonSerializable
 {
     const BRAIN_INPUTS = 4;
@@ -58,13 +60,13 @@ class MineSweeper implements JsonSerializable
     public function __construct()
     {
         $this->reset();
-        $this->lookAt = new Vector(0, 0);
+        $this->lookAt = Vector::nullVector(2);
         $this->neuralNet = new NeuralNet(self::BRAIN_INPUTS, self::BRAIN_OUTPUTS, self::BRAIN_HIDDEN_LAYERS, self::BRAIN_NEURONS_PER_HIDDEN_LAYER);
     }
 
     public function reset()
     {
-        $this->position = new Vector(mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT));
+        $this->position = new Vector([mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT)]);
         $this->rotation = rand(0, 100) * pi() * 2;
         $this->fitness = 0;
     }
@@ -107,7 +109,7 @@ class MineSweeper implements JsonSerializable
     {
         $distance = $this->position->subtract($mines[$this->closestMine]);
 
-        if (Vector::length($distance) < (Mine::SIZE + self::SIZE)) {
+        if ($distance->length() < (Mine::SIZE + self::SIZE)) {
             return $this->closestMine;
         }
 
@@ -139,15 +141,17 @@ class MineSweeper implements JsonSerializable
         $closestMine = $this->getClosestMine($mines);
 
         // normalise it
-        Vector::normalize($closestMine);
+        if ($closestMine->length() != 0) {
+            $closestMine = $closestMine->normalize();
+        }
 
         // add in vector to closest mine
-        $inputs[] = $closestMine->x;
-        $inputs[] = $closestMine->y;
+        $inputs[] = $closestMine->components()[0];
+        $inputs[] = $closestMine->components()[1];
 
         // add in sweepers look at vector
-        $inputs[] = $this->lookAt->x;
-        $inputs[] = $this->lookAt->y;
+        $inputs[] = $this->lookAt->components()[0];
+        $inputs[] = $this->lookAt->components()[1];
 
 
         // update the brain and get feedback
@@ -173,24 +177,23 @@ class MineSweeper implements JsonSerializable
         $this->speed = ($this->leftTrack + $this->rightTrack);
 
         // update Look At
-        $this->lookAt->x = -sin($this->rotation);
-        $this->lookAt->y = cos($this->rotation);
+        $this->lookAt = new Vector([-sin($this->rotation), cos($this->rotation)]);
 
         // update position
-        $this->position = $this->position->add($this->lookAt->multiply($this->speed));
+        $this->position = $this->position->add($this->lookAt->multiplyByScalar($this->speed));
 
         // wrap around window limits
-        if ($this->position->x > Simulation::WIDTH) {
-            $this->position->x = 0;
+        if ($this->position->components()[0] > Simulation::WIDTH) {
+            $this->position = new Vector([0, $this->position->components()[1]]);
         }
-        if ($this->position->x < 0) {
-            $this->position->x = Simulation::WIDTH;
+        if ($this->position->components()[0] < 0) {
+            $this->position = new Vector([Simulation::WIDTH, $this->position->components()[1]]);
         }
-        if ($this->position->y > Simulation::HEIGHT) {
-            $this->position->y = 0;
+        if ($this->position->components()[1] > Simulation::HEIGHT) {
+            $this->position = new Vector([$this->position->components()[0], 0]);
         }
-        if ($this->position->y < 0) {
-            $this->position->y = Simulation::HEIGHT;
+        if ($this->position->components()[1] < 0) {
+            $this->position = new Vector([$this->position->components()[0], Simulation::HEIGHT]);
         }
 
         return true;
@@ -204,11 +207,11 @@ class MineSweeper implements JsonSerializable
     public function getClosestMine(array $mines)
     {
         $closestSoFar = 99999;
-        $closestObject = new Vector(0, 0);
+        $closestObject = Vector::nullVector(2);
 
         // cycle through mines to find closest
         for ($i = 0; $i < count($mines); $i++) {
-            $distanceToObject = Vector::length($mines[$i]->subtract($this->position));
+            $distanceToObject = $mines[$i]->subtract($this->position)->length();
 
             if ($distanceToObject < $closestSoFar) {
                 $closestSoFar = $distanceToObject;
@@ -234,7 +237,7 @@ class MineSweeper implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'position' => $this->position,
+            'position' => ['x' => $this->position->components()[0], 'y' => $this->position->components()[1]],
             'fitness' => $this->fitness,
         ];
     }
