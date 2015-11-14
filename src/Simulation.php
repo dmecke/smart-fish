@@ -1,6 +1,6 @@
 <?php
 
-class Simulation
+class Simulation implements JsonSerializable
 {
     const WIDTH = 400;
     const HEIGHT = 400;
@@ -72,7 +72,7 @@ class Simulation
         }
     }
 
-    public function Update()
+    public function update()
     {
         // run the sweepers through CParams::iNumTicks amount of cycles. During
         // this loop each sweepers NN is constantly updated with the appropriate
@@ -89,14 +89,14 @@ class Simulation
                 }
 
                 // see if it's found a mine
-                $GrabHit = $this->mineSweepers[$i]->checkForMine($this->mines);
+                $grabHit = $this->mineSweepers[$i]->checkForMine($this->mines);
 
-                if ($GrabHit >= 0) {
+                if ($grabHit >= 0) {
                     // we have discovered a mine so increase fitness
                     $this->mineSweepers[$i]->incrementFitness();
 
                     // mine found so replace the mine with another at a random position
-                    $this->mines[$GrabHit] = new Vector(mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT));
+                    $this->mines[$grabHit] = new Vector(mt_rand(0, Simulation::WIDTH), mt_rand(0, Simulation::HEIGHT));
                 }
 
                 // update the chromos fitness score
@@ -141,5 +141,16 @@ class Simulation
         $bestChart = str_repeat('-', $best - $average);
 
         printf("%s %s %s %s %s%s\n", $generationString, $averageString, $worstString, $bestString, $averageChart, $bestChart);
+    }
+
+    /**
+     * @return array
+     */
+    function jsonSerialize()
+    {
+        return [
+            'mineSweepers' => $this->mineSweepers,
+            'mines' => $this->mines,
+        ];
     }
 }

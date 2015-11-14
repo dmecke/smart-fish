@@ -1,6 +1,6 @@
 <?php
 
-class Vector
+class Vector implements JsonSerializable
 {
     /**
      * @var float
@@ -73,5 +73,16 @@ class Vector
             $v->x = $v->x / $vector_length;
             $v->y = $v->y / $vector_length;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'x' => $this->x,
+            'y' => $this->y,
+        ];
     }
 }

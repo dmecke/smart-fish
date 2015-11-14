@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Smart Sweepers</title>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script type="text/javascript">
+var data;
+
+var ws = new WebSocket('ws://localhost:8080');
+ws.onmessage = function(event) { data = JSON.parse(event.data); };
+
+setInterval(render, 30);
+
+function render()
+{
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+    var scale = 2;
+
+    canvas.width = 400 * scale;
+    canvas.height = 400 * scale;
+    context.clearRect(0, 0, 400 * scale, 400 * scale);
+
+    context.font = (4 * scale) + 'px Arial';
+    for (var i = 0; i < data.mineSweepers.length; i++) {
+        var mineSweeper = data.mineSweepers[i];
+        var positionX = mineSweeper.position.x * scale - 2;
+        var positionY = mineSweeper.position.y * scale - 2;
+        context.fillStyle = '#f00';
+        context.fillRect(positionX, positionY, 5 * scale, 5 * scale);
+
+        context.fillStyle = '#fff';
+        context.fillText(mineSweeper.fitness, positionX + scale, positionY + scale * 4);
+    }
+
+    context.fillStyle = '#00f';
+    for (var j = 0; j < data.mines.length; j++) {
+        var mine = data.mines[j];
+        context.fillRect(mine.x * scale, mine.y * scale, scale, scale);
+    }
+}
+    </script>
+</body>
+</html>

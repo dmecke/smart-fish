@@ -1,6 +1,6 @@
 <?php
 
-class MineSweeper
+class MineSweeper implements JsonSerializable
 {
     const BRAIN_INPUTS = 4;
     const BRAIN_OUTPUTS = 2;
@@ -226,5 +226,16 @@ class MineSweeper
     public function getPosition()
     {
         return $this->position;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'position' => $this->position,
+            'fitness' => $this->fitness,
+        ];
     }
 }

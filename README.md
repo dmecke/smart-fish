@@ -13,5 +13,5 @@ composer install
 ## Usage
 
 ```bash
-php index.php
+php app.php
 ```
