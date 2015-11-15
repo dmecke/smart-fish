@@ -3,7 +3,7 @@
 namespace SmartFish\NeuralNet;
 
 use OutOfRangeException;
-use SmartFish\Util;
+use SmartFish\System\Util;
 
 class Neuron
 {

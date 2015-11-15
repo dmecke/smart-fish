@@ -12,6 +12,22 @@ composer install
 
 ## Usage
 
+For default settings use:
+
 ```bash
-php app.php
+php app.php smartfish:run
 ```
+
+To adjust the frames per second for the calculation use: (defaults to 30)
+
+```bash
+php app.php smartfish:run --fps=60
+```
+
+To adjust the number of ticks that are calculated per generation use: (defaults to 2000)
+
+```bash
+php app.php smartfish:run --ticks-per-generation=5000
+```
+
+All options can be combined of course.

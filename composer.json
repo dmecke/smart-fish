@@ -20,6 +20,7 @@
         }
     },
     "require": {
+        "symfony/console": "2.7.*",
         "cboden/ratchet": "0.3.*",
         "doctrine/collections": "1.3.0",
         "nubs/vectorix": "1.1.0"

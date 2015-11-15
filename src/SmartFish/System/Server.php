@@ -1,11 +1,12 @@
 <?php
 
-namespace SmartFish;
+namespace SmartFish\System;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
+use SmartFish\Simulation\Simulation;
 
 class Server implements MessageComponentInterface
 {

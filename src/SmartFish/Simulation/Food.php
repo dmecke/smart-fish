@@ -1,6 +1,6 @@
 <?php
 
-namespace SmartFish;
+namespace SmartFish\Simulation;
 
 use JsonSerializable;
 use Nubs\Vectorix\Vector;

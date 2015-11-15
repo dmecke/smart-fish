@@ -5,6 +5,8 @@ namespace SmartFish;
 use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
 use Ratchet\ConnectionInterface;
+use SmartFish\Simulation\Simulation;
+use SmartFish\System\Server;
 
 class ServerTest extends PHPUnit_Framework_TestCase
 {
@@ -48,7 +50,7 @@ class ServerTest extends PHPUnit_Framework_TestCase
      */
     private function createSimulationMock()
     {
-        $simulation = $this->getMockBuilder(Simulation::class)->setMethods(['update'])->getMock();
+        $simulation = $this->getMockBuilder(Simulation::class)->disableOriginalConstructor()->setMethods(['update'])->getMock();
         $simulation->expects($this->once())->method('update');
 
         return $simulation;

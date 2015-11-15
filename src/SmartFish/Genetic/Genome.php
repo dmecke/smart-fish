@@ -2,7 +2,7 @@
 
 namespace SmartFish\Genetic;
 
-use SmartFish\Util;
+use SmartFish\System\Util;
 
 class Genome
 {

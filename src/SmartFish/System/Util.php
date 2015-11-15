@@ -1,6 +1,6 @@
 <?php
 
-namespace SmartFish;
+namespace SmartFish\System;
 
 class Util
 {

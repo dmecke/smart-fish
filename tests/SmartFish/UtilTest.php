@@ -3,6 +3,7 @@
 namespace SmartFish;
 
 use PHPUnit_Framework_TestCase;
+use SmartFish\System\Util;
 
 class UtilTest extends PHPUnit_Framework_TestCase
 {

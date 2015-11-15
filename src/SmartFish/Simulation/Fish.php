@@ -1,11 +1,12 @@
 <?php
 
-namespace SmartFish;
+namespace SmartFish\Simulation;
 
 use JsonSerializable;
 use Nubs\Vectorix\Vector;
 use SmartFish\Genetic\Genome;
 use SmartFish\NeuralNet\Net;
+use SmartFish\System\Util;
 
 class Fish implements JsonSerializable
 {

@@ -3,7 +3,7 @@
 namespace SmartFish\Genetic;
 
 use Exception;
-use SmartFish\Util;
+use SmartFish\System\Util;
 
 class GenomeSelector
 {

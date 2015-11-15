@@ -1,18 +1,17 @@
 <?php
 
-namespace SmartFish;
+namespace SmartFish\Simulation;
 
 use JsonSerializable;
 use SmartFish\Genetic\Algorithm;
 use SmartFish\Genetic\Genome;
 use SmartFish\NeuralNet\Net;
+use SmartFish\System\Output;
 
 class Simulation implements JsonSerializable
 {
     const WIDTH = 400;
     const HEIGHT = 400;
-
-    const TICKS_PER_GENERATION = 2000;
 
     const NUMBER_OF_FISHES = 30;
     const NUMBER_OF_FOOD = 40;
@@ -37,8 +36,25 @@ class Simulation implements JsonSerializable
      */
     private $generation = 0;
 
-    public function __construct()
+    /**
+     * @var int
+     */
+    private $ticksPerGeneration;
+
+    /**
+     * @var Output
+     */
+    private $output;
+
+    /**
+     * @param Output $output
+     * @param int $ticksPerGeneration
+     */
+    public function __construct(Output $output, $ticksPerGeneration = 2000)
     {
+        $this->output = $output;
+        $this->ticksPerGeneration = $ticksPerGeneration;
+
         // let's create the fishes
         for ($i = 0; $i < self::NUMBER_OF_FISHES; $i++) {
             $neuralNet = $this->createNeuralNet();
@@ -57,9 +73,8 @@ class Simulation implements JsonSerializable
         // run the fish through all ticks of a generation. During
         // this loop each fish NN is constantly updated with the appropriate
         // information from its surroundings. The output from the NN is obtained
-        // and the fish is moved. If it finds food its fitness is
-        // updated appropriately,
-        if ($this->tick < self::TICKS_PER_GENERATION) {
+        // and the fish is moved. If it finds food its fitness is updated appropriately
+        if ($this->tick < $this->ticksPerGeneration) {
             $this->calculateTick();
         } else {
             $this->calculateEndOfGeneration();
@@ -79,35 +94,10 @@ class Simulation implements JsonSerializable
         ];
     }
 
-    private function printGeneration()
-    {
-        $generation = $this->generation;
-        $average = floor($this->averageFitness());
-        $best = floor($this->bestFitness());
-        $worst = floor($this->worstFitness());
-
-        $generationString = str_pad(sprintf('Generation %s', $generation), 15);
-        $averageString = str_pad(sprintf('Average: %s', $average), 13);
-        $bestString = str_pad(sprintf('Best: %s', $best), 10);
-        $worstString = str_pad(sprintf('Worst: %s', $worst), 10);
-        $averageChart = str_repeat('=', $average);
-        $bestChart = str_repeat('-', $best - $average);
-
-        printf(
-            "%s %s %s %s %s%s\n",
-            $generationString,
-            $averageString,
-            $worstString,
-            $bestString,
-            $averageChart,
-            $bestChart
-        );
-    }
-
     /**
      * @return float|null
      */
-    private function bestFitness()
+    public function bestFitness()
     {
         $best = null;
         foreach ($this->fishes as $fish) {
@@ -122,7 +112,7 @@ class Simulation implements JsonSerializable
     /**
      * @return float|null
      */
-    private function worstFitness()
+    public function worstFitness()
     {
         $worst = null;
         foreach ($this->fishes as $fish) {
@@ -150,7 +140,7 @@ class Simulation implements JsonSerializable
     /**
      * @return float
      */
-    private function averageFitness()
+    public function averageFitness()
     {
         return $this->totalFitness() / count($this->fishes);
     }
@@ -172,7 +162,7 @@ class Simulation implements JsonSerializable
         $geneticAlgorithm = new Algorithm();
         $genomes = $geneticAlgorithm->epoch($genomes);
 
-        $this->printGeneration();
+        $this->output->outputGeneration($this);
 
         // insert the new (hopefully)improved brains back into the fishes and reset their positions etc
         for ($i = 0; $i < self::NUMBER_OF_FISHES; $i++) {
@@ -207,5 +197,13 @@ class Simulation implements JsonSerializable
     private function createNeuralNet()
     {
         return new Net(Fish::BRAIN_INPUTS, Fish::BRAIN_OUTPUTS, Fish::BRAIN_HIDDEN_LAYERS, Fish::BRAIN_NEURONS_PER_HIDDEN_LAYER);
+    }
+
+    /**
+     * @return int
+     */
+    public function getGeneration()
+    {
+        return $this->generation;
     }
 }
