@@ -1,12 +1,10 @@
 <?php
 
-namespace SmartFish;
+namespace SmartFish\Simulation;
 
 use PHPUnit_Framework_TestCase;
 use SmartFish\Genetic\Genome;
 use SmartFish\NeuralNet\Net;
-use SmartFish\Simulation\Fish;
-use SmartFish\Simulation\Food;
 
 class FishTest extends PHPUnit_Framework_TestCase
 {

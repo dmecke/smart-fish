@@ -1,12 +1,11 @@
 <?php
 
-namespace SmartFish;
+namespace SmartFish\System;
 
 use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
 use Ratchet\ConnectionInterface;
 use SmartFish\Simulation\Simulation;
-use SmartFish\System\Server;
 
 class ServerTest extends PHPUnit_Framework_TestCase
 {
