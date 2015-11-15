@@ -15,13 +15,16 @@ class Server implements MessageComponentInterface
     private $simulation;
 
     /**
-     * @var ConnectionInterface[]
+     * @var ArrayCollection|ConnectionInterface[]
      */
     private $connections;
 
-    public function __construct()
+    /**
+     * @param Simulation $simulation
+     */
+    public function __construct(Simulation $simulation)
     {
-        $this->simulation = new Simulation();
+        $this->simulation = $simulation;
         $this->connections = new ArrayCollection();
     }
 
