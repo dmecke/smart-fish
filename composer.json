@@ -26,7 +26,8 @@
         "nubs/vectorix": "1.1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "5.0.*"
+        "humbug/humbug": "1.0.0-alpha1",
+        "phpunit/phpunit": "4.5.*"
     },
     "scripts": {
         "test": "phpunit"

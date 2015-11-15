@@ -31,3 +31,17 @@ php app.php smartfish:run --ticks-per-generation=5000
 ```
 
 All options can be combined of course.
+
+## Testing
+
+To run the testsuite use:
+
+```bash
+./vendor/bin/phpunit
+```
+
+To run the mutation testing use:
+
+```bash
+./vendor/bin/humbug
+```
