@@ -1,4 +1,8 @@
-[![Build Status](https://travis-ci.org/dmecke/smart-fish.svg)](https://travis-ci.org/dmecke/smart-fish)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](/LICENSE)
+[![Build Status](https://img.shields.io/travis/dmecke/smart-fish.svg?style=flat-square)](https://travis-ci.org/dmecke/smart-fish)
+[![Code Quality](https://img.shields.io/scrutinizer/g/dmecke/smart-fish.svg?style=flat-square)](https://scrutinizer-ci.com/g/dmecke/smart-fish/?branch=master)
+[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/dmecke/smart-fish.svg?style=flat-square)](https://scrutinizer-ci.com/g/dmecke/smart-fish/?branch=master)
+[![Project Status](https://img.shields.io/badge/status-evolving-brightgreen.svg?style=flat-square)](/)
 
 # Neural Network with Genetic Algorithm
 
